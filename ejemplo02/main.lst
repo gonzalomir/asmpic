@@ -1,0 +1,173 @@
+MPASM  5.51                          MAIN.ASM   8-8-2014  14:36:09         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 #include p16f84a.inc    ; Carga la cabecera del microcontrolador
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F84A processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00208         LIST
+                      00002         radix   dec                     ; Por defecto los numeros estaran
+                      00003                                                 ; expresados en decimal 
+  00000005            00004 RP0     EQU     5                               ; Asignando el alias RP0 el valor de 5
+                      00005 
+0000                  00006         ORG     0x00
+0000   2805           00007         GOTO INICIO     ; Ir al inicio del programa
+0004                  00008         ORG     0x04    ; Zona de interrupciones
+0004   2805           00009         GOTO INICIO     ; Ir al inicio del programa
+                      00010         
+                      00011 ;*****INICIO DEL PROGRAMA*****
+0005   0183           00012 INICIO  CLRF STATUS             ; Borra el contenido de STATUS
+0006   1683           00013                 BSF     STATUS,RP0      ; Seleccionamos el Banco 1
+0007   30FF           00014                 MOVLW 0xFF              ; Cargamos un valor literal en W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0008   0085           00015                 MOVWF TRISA             ; Movemos el valor de W a TRISA,
+                      00016                                                 ; configurando el puerto entero como entrada
+0009   3000           00017                 MOVLW 0x00              ; Cargamos un valor literal en W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000A   0086           00018                 MOVWF TRISB             ; Movemos el valor de W a TRISA,
+                      00019                                                 ; configurando el puerto entero como entrada
+000B   1283           00020                 BCF STATUS,RP0  ; Seleccionamos el Banco 0
+000C   0805           00021 LEER    MOVF PORTA,0    ; Movemos el contenido del PORTA al W
+000D   0086           00022                 MOVWF PORTB             ; Movemos el valor de W a PORTB
+000E   280C           00023                 GOTO LEER               ; Salto incondicional a la etiqueta LEER
+                      00024                 END                             ; Fin del programa
+MPASM  5.51                          MAIN.ASM   8-8-2014  14:36:09         PAGE  2
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+C                                 00000000
+DC                                00000001
+EEADR                             00000009
+EECON1                            00000088
+EECON2                            00000089
+EEDATA                            00000008
+EEIE                              00000006
+EEIF                              00000004
+F                                 00000001
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INICIO                            00000005
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+LEER                              0000000C
+NOT_PD                            00000003
+NOT_RBPU                          00000007
+NOT_TO                            00000004
+OPTION_REG                        00000081
+PCL                               00000002
+PCLATH                            0000000A
+PORTA                             00000005
+PORTB                             00000006
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RD                                00000000
+RP0                               00000005
+RP1                               00000006
+STATUS                            00000003
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+MPASM  5.51                          MAIN.ASM   8-8-2014  14:36:09         PAGE  3
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+T0SE                              00000004
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_CONFIG                           00002007
+_CP_OFF                           00003FFF
+_CP_ON                            0000000F
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F84A                          00000001
+__DEBUG                           1
+MPASM  5.51                          MAIN.ASM   8-8-2014  14:36:09         PAGE  4
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+
+0000 : X---XXXXXXXXXXX- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:    12
+Program Memory Words Free:  1012
+
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     2 reported,     0 suppressed
+
+
