@@ -1,0 +1,215 @@
+MPASM  5.51                          MAIN.ASM   8-8-2014  17:21:59         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 #include p16f84a.inc    ; Carga la cabecera del microcontrolador
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F84A processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00208         LIST
+                      00002         radix   dec                     ; Por defecto los numeros estaran
+                      00003                                                 ; expresados en decimal 
+  00000005            00004 RP0     EQU     5                               ; Asignando el alias RP0 el valor de 5
+                      00005 
+0000                  00006         ORG     0x00
+0000   2805           00007         GOTO INICIO     ; Ir al inicio del programa
+0004                  00008         ORG     0x04    ; Zona de interrupciones
+0004   2805           00009         GOTO INICIO     ; Ir al inicio del programa
+                      00010         
+                      00011 ;*****INICIO DEL PROGRAMA*****
+0005   0183           00012 INICIO  CLRF STATUS                     ; Borra el contenido de STATUS
+0006   1683           00013                 BSF     STATUS,RP0              ; Seleccionamos el Banco 1
+0007   30FF           00014                 MOVLW 0xFF                      ; Cargamos un valor literal en W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0008   0085           00015                 MOVWF TRISA                     ; Movemos el valor de W a TRISA,
+                      00016                                                         ; configurando el puerto entero como entrada
+0009   3000           00017                 MOVLW 0x00                      ; Cargamos un valor literal en W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000A   0086           00018                 MOVWF TRISB                     ; Movemos el valor de W a TRISA,
+                      00019                                                         ; configurando el puerto entero como entrada
+000B   1283           00020                 BCF STATUS,RP0          ; Seleccionamos el Banco 0
+                      00021 
+000C   1805           00022 LEER_0  BTFSC PORTA,0           ; Leemos y analizamos el bit 0 del PORTA
+000D   2811           00023                 GOTO LEER_1                     ; Si no es cero salto incondicional
+000E   3006           00024                 MOVLW B'00000110'       ; Cargamos un literal al W. 7Seg(1)->W
+000F   0806           00025                 MOVFW PORTB                     ; Movemos el W al PORTB
+0010   280C           00026                 GOTO LEER_0                     ; Salto incondicional a LEER_0
+                      00027 
+0011   1885           00028 LEER_1  BTFSC PORTA,1           ; Leemos y analizamos el bit 0 del PORTA
+0012   2816           00029                 GOTO LEER_2                     ; Si no es cero salto incondicional
+0013   305B           00030                 MOVLW b'01011011'       ; Cargamos un literal al W. 7Seg(2)->W
+0014   0806           00031                 MOVFW PORTB                     ; Movemos el W al PORTB
+0015   280C           00032                 GOTO LEER_0                     ; Salto incondicional a LEER_0
+                      00033 
+0016   1905           00034 LEER_2  BTFSC PORTA,2           ; Leemos y analizamos el bit 0 del PORTA
+0017   281B           00035                 GOTO LEER_3                     ; Si no es cero salto incondicional
+0018   304F           00036                 MOVLW b'01001111'       ; Cargamos un literal al W. 7Seg(3)->W
+0019   0806           00037                 MOVFW PORTB                     ; Movemos el W al PORTB
+001A   280C           00038                 GOTO LEER_0                     ; Salto incondicional a LEER_0
+                      00039 
+001B   1985           00040 LEER_3  BTFSC PORTA,3           ; Leemos y analizamos el bit 0 del PORTA
+001C   2820           00041                 GOTO LEER_4                     ; Si no es cero salto incondicional
+001D   3066           00042                 MOVLW b'01100110'       ; Cargamos un literal al W. 7Seg(4)->W
+MPASM  5.51                          MAIN.ASM   8-8-2014  17:21:59         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+001E   0806           00043                 MOVFW PORTB                     ; Movemos el W al PORTB
+001F   280C           00044                 GOTO LEER_0                     ; Salto incondicional a LEER_0
+                      00045 
+0020   1A05           00046 LEER_4  BTFSC PORTA,4           ; Leemos y analizamos el bit 0 del PORTA
+0021   2825           00047                 GOTO NO_CERO            ; Si no es cero salto incondicional
+0022   306D           00048                 MOVLW b'01101101'       ; Cargamos un literal al W. 7Seg(4)->W
+0023   0806           00049                 MOVFW PORTB                     ; Movemos el W al PORTB
+0024   280C           00050                 GOTO LEER_0                     ; Salto incondicional a LEER_0
+                      00051 
+0025   303F           00052 NO_CERO MOVLW b'00111111'       ; Cargamos un literal al W. 7Seg(0)->0
+0026   0086           00053                 MOVWF PORTB                     ; Movemos el W al PORTB
+0027   280C           00054                 GOTO LEER_0                     ; Salto incondicional a LEER_0
+                      00055                 END                                     ; Fin del programa
+MPASM  5.51                          MAIN.ASM   8-8-2014  17:21:59         PAGE  3
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+C                                 00000000
+DC                                00000001
+EEADR                             00000009
+EECON1                            00000088
+EECON2                            00000089
+EEDATA                            00000008
+EEIE                              00000006
+EEIF                              00000004
+F                                 00000001
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INICIO                            00000005
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+LEER_0                            0000000C
+LEER_1                            00000011
+LEER_2                            00000016
+LEER_3                            0000001B
+LEER_4                            00000020
+NOT_PD                            00000003
+NOT_RBPU                          00000007
+NOT_TO                            00000004
+NO_CERO                           00000025
+OPTION_REG                        00000081
+PCL                               00000002
+PCLATH                            0000000A
+PORTA                             00000005
+PORTB                             00000006
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RD                                00000000
+RP0                               00000005
+MPASM  5.51                          MAIN.ASM   8-8-2014  17:21:59         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RP1                               00000006
+STATUS                            00000003
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_CONFIG                           00002007
+_CP_OFF                           00003FFF
+_CP_ON                            0000000F
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F84A                          00000001
+__DEBUG                           1
+MPASM  5.51                          MAIN.ASM   8-8-2014  17:21:59         PAGE  5
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+
+0000 : X---XXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXX-------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:    37
+Program Memory Words Free:   987
+
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     2 reported,     0 suppressed
+
+
