@@ -1,0 +1,40 @@
+MPLINK 4.49, Linker
+Linker Map File - Created Mon Aug 11 12:28:39 2014
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_1       code   0x000000    program   0x000002
+                   .org_2       code   0x000004    program   0x00003a
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000004    0x000020      
+            30 out of 1094 program addresses used, program memory utilization is 2%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                    BUCLE   0x00000b    program     static G:\icei\asmpic\ejemplo04\main.asm
+                   INICIO   0x000015    program     static G:\icei\asmpic\ejemplo04\main.asm
+                 PARPADEA   0x00001c    program     static G:\icei\asmpic\ejemplo04\main.asm
+                    TEMPO   0x000005    program     static G:\icei\asmpic\ejemplo04\main.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                    TEMPO   0x000005    program     static G:\icei\asmpic\ejemplo04\main.asm
+                    BUCLE   0x00000b    program     static G:\icei\asmpic\ejemplo04\main.asm
+                   INICIO   0x000015    program     static G:\icei\asmpic\ejemplo04\main.asm
+                 PARPADEA   0x00001c    program     static G:\icei\asmpic\ejemplo04\main.asm
+
+

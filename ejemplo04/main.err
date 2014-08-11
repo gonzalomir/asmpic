@@ -1,0 +1,3 @@
+Warning[205] G:\ICEI\ASMPIC\EJEMPLO04\MAIN.ASM 2 : Found directive in column 1. (radix)
+Message[302] G:\ICEI\ASMPIC\EJEMPLO04\MAIN.ASM 39 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] G:\ICEI\ASMPIC\EJEMPLO04\MAIN.ASM 42 : Register in operand not in bank 0.  Ensure that bank bits are correct.
