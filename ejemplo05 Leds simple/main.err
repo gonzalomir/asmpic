@@ -1,0 +1,5 @@
+Warning[205] G:\ICEI\ASMPIC\EJEMPLO05 LEDS SIMPLE\MAIN.ASM 2 : Found directive in column 1. (radix)
+Warning[207] G:\ICEI\ASMPIC\EJEMPLO05 LEDS SIMPLE\MAIN.ASM 4 : Found label after column 1. (W)
+Warning[207] G:\ICEI\ASMPIC\EJEMPLO05 LEDS SIMPLE\MAIN.ASM 5 : Found label after column 1. (F)
+Message[302] G:\ICEI\ASMPIC\EJEMPLO05 LEDS SIMPLE\MAIN.ASM 30 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] G:\ICEI\ASMPIC\EJEMPLO05 LEDS SIMPLE\MAIN.ASM 33 : Register in operand not in bank 0.  Ensure that bank bits are correct.
