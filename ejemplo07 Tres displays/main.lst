@@ -1,0 +1,316 @@
+MPASM  5.51                          MAIN.ASM   8-14-2014  22:34:05         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 #include <p16f84a.inc>  ; Carga la cabecera del microcontrolador
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F84A processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00208         LIST
+Warning[205]: Found directive in column 1. (radix)
+                      00002 radix   dec                             ; Por defecto los numeros estaran
+                      00003                                                 ; expresados en decimal 
+                      00004 ;*** ZONA DE ETIQUETAS ***
+Warning[207]: Found label after column 1. (W)
+  00000000            00005         W       EQU 0
+Warning[207]: Found label after column 1. (F)
+  00000001            00006         F       EQU 1
+  00000000            00007 DISP_U  EQU 0
+  00000001            00008 DISP_D  EQU 1
+  00000002            00009 DISP_C  EQU 2
+                      00010 
+                      00011 ;*** ZONA DE ETIQUETAS DE LOS REGISTROS RAM ***
+  0000000C            00012 CTDOR1  EQU 0x0C
+  0000000D            00013 CTDOR2  EQU 0x0D
+  0000000E            00014 NUM_U   EQU 0x0E
+  0000000F            00015 NUM_D   EQU 0x0F
+  00000010            00016 NUM_C   EQU 0x10
+                      00017 
+                      00018 ;*** ZONA DE INICIO DEL MICROCONTROLADOR ***
+0000                  00019         ORG     0x00
+0000   2840           00020         GOTO INICIO     ; Ir al inicio del programa
+0004                  00021         ORG     0x04    ; Zona de interrupciones
+0004   2840           00022         GOTO INICIO     ; Ir al inicio del programa
+                      00023 
+                      00024 ;***** ZONA DE SUBRUTINAS Y TABLAS *****
+                      00025 ;***RUTINA DE SACAR EL NUMERO COMPLETO = SACAR_N
+0005   080E           00026 SACAR_N MOVF NUM_U,W            ; Carga en W el valor del registro NUM_U
+0006   2035           00027                 CALL TABLA                      ; Conversion de un numero en los niveles de salida neces
+                            arios
+0007   1005           00028                 BCF PORTA,DISP_U        ; Habilitamos el display de unidades
+0008   0086           00029                 MOVWF PORTB                     ; Sacar el valor por el PORTB
+0009   2030           00030                 CALL TEMPO                      ; Llamada a la rutina de retardo
+000A   080F           00031                 MOVF NUM_D,W            ; Carga en W el valor del registro NUM_D
+000B   2035           00032                 CALL TABLA                      ; Conversion de un numero en los niveles de salida neces
+                            arios
+000C   1405           00033                 BSF PORTA,DISP_U        ; Deshabilitamos el display de unidades
+                      00034 
+000D   1085           00035                 BCF PORTA,DISP_D        ; Habilitamos el display de decenas
+000E   0086           00036                 MOVWF PORTB                     ; Sacar el valor por el PORTB
+000F   2030           00037                 CALL TEMPO                      ; Llamada a la rutina de retardo
+0010   0810           00038                 MOVF NUM_C,W            ; Carga en W el valor del registro NUM_C
+0011   2035           00039                 CALL TABLA                      ; Conversion de un numero en los niveles de salida neces
+MPASM  5.51                          MAIN.ASM   8-14-2014  22:34:05         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                            arios
+0012   1485           00040                 BSF PORTA,DISP_D        ; Deshabilitamos el display de decenas
+                      00041 
+0013   1105           00042                 BCF PORTA,DISP_C        ; Habilitamos el display de centenas
+0014   0086           00043                 MOVWF PORTB                     ; Sacar el valor por el PORTB
+0015   2030           00044                 CALL TEMPO                      ; Llamada a la rutina de retardo
+0016   1505           00045                 BSF PORTA,DISP_C        ; Deshabilitamos el display de centenas
+0017   3400           00046                 RETLW 0
+                      00047 
+                      00048 ;***RUTINA DE SUMAR LOS TRES REGISTROS = SUMAR          
+0018   0A8E           00049 SUMAR   INCF NUM_U,F            ; Incrementamos el registro de unidades
+0019   300A           00050                 MOVLW 10                        ; Cargamos el literal 10 en W (10->W)
+001A   020E           00051                 SUBWF NUM_U,W           ; Restamos el valor del W y del registro NUM_U
+001B   1903           00052                 BTFSC STATUS,Z          ; Comprobamos si NUM_U = 10
+001C   281E           00053                 GOTO SI_IG_U            ; Si se ha llegado a 10 tendremos que seguir operando
+001D   3400           00054                 RETLW 0                         ; Si no se ha llegado a 10, salimos de la subrutina de s
+                            umar
+001E   018E           00055 SI_IG_U CLRF NUM_U                      ; Ponemos a cero las unidades
+001F   0A8F           00056                 INCF NUM_D,F            ; Incrementamos el registro de decenas
+0020   300A           00057                 MOVLW 10                        ; Cargamos el literal 10 en W (10->W)
+0021   020F           00058                 SUBWF NUM_D,W           ; Restamos el valor del W y del registro NUM_U
+0022   1903           00059                 BTFSC STATUS,Z          ; Comprobamos si NUM_U = 10
+0023   2825           00060                 GOTO SI_IG_D            ; Si se ha llegado a 10 tendremos que seguir operando
+0024   3400           00061                 RETLW 0                         ; Si no se ha llegado a 10, salimos de la subrutina de s
+                            umar
+0025   018F           00062 SI_IG_D CLRF NUM_D                      ; Ponemos a cero las unidades
+0026   0A90           00063                 INCF NUM_C,F            ; Incrementamos el registro de centenas
+0027   300A           00064                 MOVLW 10                        ; Cargamos el literal 10 en W (10->W)
+0028   0210           00065                 SUBWF NUM_C,W           ; Restamos el valor del W y del registro NUM_U
+0029   1903           00066                 BTFSC STATUS,Z          ; Comprobamos si NUM_U = 10
+002A   282C           00067                 GOTO SI_IG_C            ; Si se ha llegado a 10 tendremos que seguir operando
+002B   3400           00068                 RETLW 0                         ; Si no se ha llegado a 10, salimos de la subrutina de s
+                            umar
+002C   018E           00069 SI_IG_C CLRF NUM_U                      ; Cuando se alcanza el numero 999 se pone a 0 los tres registros
+002D   018F           00070                 CLRF NUM_D
+002E   0190           00071                 CLRF NUM_C
+002F   3400           00072                 RETLW 0
+                      00073 
+                      00074 ;***RUTINA DE RETARDO = TEMPO
+0030   30C8           00075 TEMPO   MOVLW D'200'
+0031   008C           00076                 MOVWF CTDOR1
+0032   0B8C           00077 BUCLE   DECFSZ CTDOR1,F
+0033   2832           00078                 GOTO BUCLE
+0034   3400           00079                 RETLW 0
+                      00080         
+                      00081 ;*** TABLA DISPLAY 7 SEGMENTOS, ANODO COMUN ***
+0035   0782           00082 TABLA   ADDWF PCL,F                     ; Ponsemos en PCL la de suma del PCL, y el W sera el inicio
+0036   34C0           00083                 RETLW b'11000000'       ; Devolvemos el 0
+0037   34F9           00084                 RETLW b'11111001'       ; Devolvemos el 1
+0038   34A4           00085                 RETLW b'10100100'       ; Devolvemos el 2
+0039   34B0           00086                 RETLW b'10110000'       ; Devolvemos el 3
+003A   3499           00087                 RETLW b'10011001'       ; Devolvemos el 4
+003B   3492           00088                 RETLW b'10010010'       ; Devolvemos el 5
+MPASM  5.51                          MAIN.ASM   8-14-2014  22:34:05         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+003C   3482           00089                 RETLW b'10000010'       ; Devolvemos el 6
+003D   34F8           00090                 RETLW b'11111000'       ; Devolvemos el 7
+003E   3480           00091                 RETLW b'10000000'       ; Devolvemos el 8
+003F   3490           00092                 RETLW b'10010000'       ; Devolvemos el 9
+                      00093 
+                      00094 ;*****INICIO DEL PROGRAMA*****
+0040   0183           00095 INICIO  CLRF STATUS                     ; Borra el contenido de STATUS
+0041   1683           00096                 BSF     STATUS,RP0              ; Seleccionamos el Banco 1
+0042   30F8           00097                 MOVLW b'11111000'       ; Cargamos un valor literal en W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0043   0085           00098                 MOVWF TRISA                     ; Movemos el valor de W a TRISA, PORTA tiene 3 lineas de
+                             salida
+                      00099 
+0044   3000           00100                 MOVLW b'00000000'       ; Cargamos un valor literal en W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0045   0086           00101                 MOVWF TRISB                     ; Movemos el valor de W a TRISA, PORTB como salida en su
+                             totalidad
+                      00102 
+0046   1283           00103                 BCF STATUS,RP0          ; Seleccionamos el Banco 0
+                      00104 
+0047   3007           00105                 MOVLW b'00000111'       ; Cargamos un valor en W
+0048   0085           00106                 MOVWF PORTA                     ; Apagamos los displays
+                      00107                 
+0049   3007           00108                 MOVLW 7                         ; Cargamos el literal 7 en W (7->W)
+004A   008E           00109                 MOVWF NUM_U                     ; Cargamos el valor de W en NUM_U (W->NUM_U)
+004B   3002           00110                 MOVLW 2                         ; Cargamos el literal 2 en W (2->W)
+004C   008F           00111                 MOVWF NUM_D                     ; Cargamos el valor de W en NUM_U (W->NUM_D)
+004D   3003           00112                 MOVLW 3                         ; Cargamos el literal 3 en W (3->W)
+004E   0090           00113                 MOVWF NUM_C                     ; Cargamos el valor de W en NUM_U (W->NUM_C)
+                      00114 
+004F   304B           00115 BUCLE1  MOVLW 75                        ; Numero de veces que sacamos un mismo numero (75->CTDOR2)
+0050   008D           00116                 MOVWF CTDOR2            ; Cargamos en CTDOR2 el valor de W. (W->CTDOR2)
+0051   2005           00117 BUCLE2  CALL SACAR_N            ; Llamado a la subrutina SACAR_N
+0052   0B8D           00118                 DECFSZ CTDOR2,F         ; Repetir el mismo número hasta que CTDOR2 == 0
+0053   2851           00119                 GOTO BUCLE2                     ; Salto incondicional a BUCLE2
+0054   2018           00120                 CALL SUMAR                      ; Llamado a la subrutina SUMAR
+0055   284F           00121                 GOTO BUCLE1                     ; Salto incondicional a BUCLE1
+                      00122                 END                                     ; Fin del programa
+MPASM  5.51                          MAIN.ASM   8-14-2014  22:34:05         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+BUCLE                             00000032
+BUCLE1                            0000004F
+BUCLE2                            00000051
+C                                 00000000
+CTDOR1                            0000000C
+CTDOR2                            0000000D
+DC                                00000001
+DISP_C                            00000002
+DISP_D                            00000001
+DISP_U                            00000000
+EEADR                             00000009
+EECON1                            00000088
+EECON2                            00000089
+EEDATA                            00000008
+EEIE                              00000006
+EEIF                              00000004
+F                                 00000001
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INICIO                            00000040
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+NOT_PD                            00000003
+NOT_RBPU                          00000007
+NOT_TO                            00000004
+NUM_C                             00000010
+NUM_D                             0000000F
+NUM_U                             0000000E
+OPTION_REG                        00000081
+PCL                               00000002
+PCLATH                            0000000A
+PORTA                             00000005
+PORTB                             00000006
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+MPASM  5.51                          MAIN.ASM   8-14-2014  22:34:05         PAGE  5
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RD                                00000000
+RP0                               00000005
+RP1                               00000006
+SACAR_N                           00000005
+SI_IG_C                           0000002C
+SI_IG_D                           00000025
+SI_IG_U                           0000001E
+STATUS                            00000003
+SUMAR                             00000018
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+TABLA                             00000035
+TEMPO                             00000030
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_CONFIG                           00002007
+_CP_OFF                           00003FFF
+_CP_ON                            0000000F
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+MPASM  5.51                          MAIN.ASM   8-14-2014  22:34:05         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F84A                          00000001
+__DEBUG                           1
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : X---XXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXX---------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:    83
+Program Memory Words Free:   941
+
+
+Errors   :     0
+Warnings :     3 reported,     0 suppressed
+Messages :     2 reported,     0 suppressed
+
+
