@@ -1,0 +1,40 @@
+MPLINK 4.49, Linker
+Linker Map File - Created Sat Aug 16 07:18:45 2014
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_1       code   0x000000    program   0x000002
+                   .org_2       code   0x000004    program   0x000050
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000004    0x00002b      
+            41 out of 1094 program addresses used, program memory utilization is 3%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   BUCLE1   0x000007    program     static G:\icei\asmpic\ejemplo08 Multiplexar salidas\main.asm
+                   INICIO   0x000014    program     static G:\icei\asmpic\ejemplo08 Multiplexar salidas\main.asm
+                   LIMPIA   0x000010    program     static G:\icei\asmpic\ejemplo08 Multiplexar salidas\main.asm
+                   SAL164   0x000005    program     static G:\icei\asmpic\ejemplo08 Multiplexar salidas\main.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   SAL164   0x000005    program     static G:\icei\asmpic\ejemplo08 Multiplexar salidas\main.asm
+                   BUCLE1   0x000007    program     static G:\icei\asmpic\ejemplo08 Multiplexar salidas\main.asm
+                   LIMPIA   0x000010    program     static G:\icei\asmpic\ejemplo08 Multiplexar salidas\main.asm
+                   INICIO   0x000014    program     static G:\icei\asmpic\ejemplo08 Multiplexar salidas\main.asm
+
+

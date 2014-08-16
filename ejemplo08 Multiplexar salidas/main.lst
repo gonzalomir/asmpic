@@ -1,0 +1,245 @@
+MPASM  5.51                          MAIN.ASM   8-16-2014  7:18:44         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 #include <p16f84a.inc>  ; Carga la cabecera del microcontrolador
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F84A processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00208         LIST
+Warning[205]: Found directive in column 1. (radix)
+                      00002 radix dec
+                      00003 
+                      00004 ;***ZONA DE ETIQUETAS***
+  00000000            00005 W       EQU     0       ; Registro de Trabajo W como destino
+  00000001            00006 F       EQU 1   ; Registro F como destino
+  00000000            00007 CL      EQU 0   ; Pin Reset del 74LS164
+  00000001            00008 CK      EQU 1   ; Pin Clock del 74LS164
+  00000002            00009 DAT EQU 2       ; Pin Data Input del 74LS164
+                      00010 
+                      00011 ;***ZONA DE ETIQUETAS DE LA RAM***
+  0000000C            00012 VAR1    EQU     0x0C
+  0000000D            00013 VAR2    EQU 0x0D
+  0000000E            00014 VAR3    EQU 0x0E
+  0000000F            00015 AUX1    EQU 0x0F
+  00000010            00016 CTDOR1  EQU 0x10
+                      00017 
+                      00018 ;***ZONA DE INICIO DEL MICROCONTROLADOR***
+0000                  00019                 ORG     0x00
+0000   2814           00020                 GOTO INICIO     ; Ir al inicio del programa
+0004                  00021                 ORG     0x04    ; Zona de interrupciones
+0004   2814           00022                 GOTO INICIO     ; Ir al inicio del programa
+                      00023 ;***ZONA DE SUBRUTINAS***
+                      00024 ;*SUBRUTINA DE SALIDA DE DATOS POR EL 74HC164 = SAL164
+0005   3008           00025 SAL164  MOVLW 8                         ; Cargamos el literal 8 en W
+0006   0090           00026                 MOVWF CTDOR1            ; Cargamos el contenido de W en CTDOR1
+0007   1085           00027 BUCLE1  BCF PORTA,CK            ; Flanco de bajada en el pin reloj (CK)
+0008   1505           00028                 BSF PORTA,DAT           ; Ponemos un 1 en el pin datos (DAT)
+0009   180F           00029                 BTFSC AUX1, 0           ; Si AUX1.0 == 0 Salta 2 posiciones
+000A   1105           00030                 BCF PORTA,DAT           ; Ponemos un 0 en el pin datos (DAT)
+000B   1485           00031                 BSF PORTA,CK            ; Flanco de subida en el pin reloj (CK)
+000C   0C8F           00032                 RRF AUX1,F                      ; Rotamos a la derecha AUX1
+000D   0B90           00033                 DECFSZ CTDOR1,F         ; Decrementamos CTDOR1 y salta si es 0
+000E   2807           00034                 GOTO BUCLE1                     ; Salto incondicional a BUCLE1
+000F   0008           00035                 RETURN                          ; Retorno de rutina
+                      00036 
+                      00037 ;*SUBRUTINA DE LIMPIEZA DE LOS DATOS DE LOS 74HC164 = LIMPIA
+0010   1405           00038 LIMPIA  BSF PORTA,CL            ; Ponemos un 1 en el pin clear/reset(CL)
+0011   1005           00039                 BCF PORTA,CL            ; Ponemos un 0 en el pin clear/reset(CL)
+0012   1405           00040                 BSF PORTA,CL            ; Ponemos un 1 en el pin clear/reset(CL)
+0013   0008           00041                 RETURN                          ; Retorno de rutina
+                      00042 
+                      00043 ;*****INICIO DEL PROGRAMA*****
+MPASM  5.51                          MAIN.ASM   8-16-2014  7:18:44         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0014   0183           00044 INICIO  CLRF STATUS                     ; Borra el contenido de STATUS
+0015   1683           00045                 BSF     STATUS,RP0              ; Seleccionamos el Banco 1
+0016   30F8           00046                 MOVLW b'11111000'       ; Cargamos un valor literal en W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0017   0085           00047                 MOVWF TRISA                     ; Movemos el valor de W a TRISA, PORTA 5 entradas 3 sali
+                            das
+0018   3000           00048                 MOVLW b'00000000'       ; Cargamos un valor literal en W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0019   0086           00049                 MOVWF TRISB                     ; Movemos el valor de W a TRISA, PORTB como salida
+001A   1283           00050                 BCF STATUS,RP0          ; Seleccionamos el Banco 0
+                      00051 
+001B   3055           00052                 MOVLW B'01010101'       ; Carga un literal al W
+001C   008C           00053                 MOVWF VAR1                      ; Pasa del W a VAR1
+001D   3033           00054                 MOVLW B'00110011'       ; Carga un literal al W
+001E   008D           00055                 MOVWF VAR2                      ; Pasa del W a VAR2
+001F   300F           00056                 MOVLW B'00001111'       ; Carga un literal al W
+0020   008E           00057                 MOVWF VAR3                      ; Pasa del W a VAR3
+                      00058 
+0021   2010           00059                 CALL LIMPIA                     ; Limpiamos los valores de los 74HC164
+                      00060 
+0022   080C           00061                 MOVF VAR1,W                     ; Cargamos en W el valor de VAR1
+0023   008F           00062                 MOVWF AUX1                      ; Cargamos el valor de W a AUX1
+0024   2005           00063                 CALL SAL164                     ; Llamamos a la subrutina de salida de datos
+                      00064 
+0025   080D           00065                 MOVF VAR2,W                     ; Cargamos en W el valor de VAR2
+0026   008F           00066                 MOVWF AUX1                      ; Cargamos el valor de W a AUX1
+0027   2005           00067                 CALL SAL164                     ; Llamamos a la subrutina de salida de datos
+                      00068 
+0028   080E           00069                 MOVF VAR3,W                     ; Cargamos en W el valor de VAR3
+0029   008F           00070                 MOVWF AUX1                      ; Cargamos el valor de W a AUX1
+002A   2005           00071                 CALL SAL164                     ; Llamamos a la subrutina de salida de datos
+                      00072 
+002B   282B           00073                 GOTO $
+                      00074                 END                                     ; Fin del programa
+MPASM  5.51                          MAIN.ASM   8-16-2014  7:18:44         PAGE  3
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+AUX1                              0000000F
+BUCLE1                            00000007
+C                                 00000000
+CK                                00000001
+CL                                00000000
+CTDOR1                            00000010
+DAT                               00000002
+DC                                00000001
+EEADR                             00000009
+EECON1                            00000088
+EECON2                            00000089
+EEDATA                            00000008
+EEIE                              00000006
+EEIF                              00000004
+F                                 00000001
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INICIO                            00000014
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+LIMPIA                            00000010
+NOT_PD                            00000003
+NOT_RBPU                          00000007
+NOT_TO                            00000004
+OPTION_REG                        00000081
+PCL                               00000002
+PCLATH                            0000000A
+PORTA                             00000005
+PORTB                             00000006
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RD                                00000000
+MPASM  5.51                          MAIN.ASM   8-16-2014  7:18:44         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RP0                               00000005
+RP1                               00000006
+SAL164                            00000005
+STATUS                            00000003
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+VAR1                              0000000C
+VAR2                              0000000D
+VAR3                              0000000E
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_CONFIG                           00002007
+_CP_OFF                           00003FFF
+_CP_ON                            0000000F
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+MPASM  5.51                          MAIN.ASM   8-16-2014  7:18:44         PAGE  5
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F84A                          00000001
+__DEBUG                           1
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : X---XXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXX---- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:    41
+Program Memory Words Free:   983
+
+
+Errors   :     0
+Warnings :     1 reported,     0 suppressed
+Messages :     2 reported,     0 suppressed
+
+

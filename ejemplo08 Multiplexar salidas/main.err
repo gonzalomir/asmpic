@@ -1,0 +1,3 @@
+Warning[205] G:\ICEI\ASMPIC\EJEMPLO08 MULTIPLEXAR SALIDAS\MAIN.ASM 2 : Found directive in column 1. (radix)
+Message[302] G:\ICEI\ASMPIC\EJEMPLO08 MULTIPLEXAR SALIDAS\MAIN.ASM 47 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] G:\ICEI\ASMPIC\EJEMPLO08 MULTIPLEXAR SALIDAS\MAIN.ASM 49 : Register in operand not in bank 0.  Ensure that bank bits are correct.
