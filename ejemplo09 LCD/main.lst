@@ -1,0 +1,436 @@
+MPASM  5.51                          MAIN.ASM   8-21-2014  7:12:17         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Warning[205]: Found directive in column 1. (include)
+                      00001 include         <P16F84A.INC>
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F84A processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00208         LIST
+                      00002 ;***************************************************;
+                      00003 ;       4 BIT LCD interfaz con PIC                                              ;
+                      00004 ;       Implementado solamente en el Puerto B (PORTB)   ;
+                      00005 ;       RB7-RB4 = DB7-DB4  ; RB3=E ; RB2=RW ; RB1=RS    ;
+                      00006 ;***************************************************;
+                      00007 
+                      00008 ;Declaracion de bits
+  00000003            00009 BIT_E   EQU     3               ; Pin 3 de PORTB, conectado al pin E del LCD
+  00000002            00010 BIT_RW  EQU     2               ; Pin 2 de PORTB, conectado al pin RW del LCD
+  00000001            00011 BIT_RS  EQU     1               ; Pin 1 de PORTB, conectado al pin RS del LCD
+                      00012 
+  00000020            00013 TEMP    EQU     0x20    ; Variable temporal TEMP
+                      00014 
+  00000021            00015 V_DLY   EQU     0x21    ; Variable para la rutina DLY
+  00000022            00016 V_DLY1  EQU     0x22    ; for DLY1
+                      00017 
+  0000001F            00018 Digito  EQU 0x1F; Cursor para leer la tabla de datos.
+                      00019 
+                      00020 
+0000                  00021                 ORG 0
+0000   2871           00022                 GOTO INICIO
+0004                  00023                 ORG 4
+0004   2871           00024                 GOTO INICIO
+                      00025                 
+                      00026 ;****** ZONA DE SUBRUTINAS ******
+                      00027 ;*** SUBRUTINA INICIALIZAR PIC = INITPIC ***
+0005                  00028 INITPIC
+0005   1683           00029                 BSF             STATUS,RP0              ; Seleccionamos el Banco 1
+0006   3000           00030                 MOVLW   b'00000000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0007   0086           00031                 MOVWF   TRISB                   ; Todos los pines PORTB seran salidas
+0008   1283           00032                 BCF             STATUS,RP0              ; Seleccionamos el Banco 0
+0009   0186           00033                 CLRF    PORTB   
+000A   0008           00034                 RETURN
+                      00035 
+                      00036 ;*** SUBRUTINA INICIALIZAR LCD = INITLCD ***            
+000B   30FE           00037 INITLCD MOVLW   0xFE            ; Espera larga (254->W)
+000C   206C           00038                 CALL    DLY1            ; 254 * 0.5 = Retardo de 127 milisegundos
+                      00039                 ; El bit Busy (Ocupado) no puede ser consultado en este momento
+000D   3038           00040                 MOVLW   b'00111000'     ; FUNCTION SET - 8 BIT, BIT_E = 1
+000E   0086           00041                 MOVWF   PORTB
+000F   1186           00042                 BCF             PORTB,BIT_E     ; BIT_E = 0
+MPASM  5.51                          MAIN.ASM   8-21-2014  7:12:17         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0010   300A           00043                 MOVLW   0x0A            ; Espera corta (10->W)
+0011   206C           00044                 CALL    DLY1            ; 10 * 0.5 = Retardo de 5 milisegundos
+0012   3038           00045                 MOVLW   b'00111000'     ; FUNCTION SET - 8 BIT, BIT_E = 1
+0013   0086           00046                 MOVWF   PORTB
+0014   1186           00047                 BCF             PORTB,BIT_E     ; BIT_E = 0
+0015   3002           00048                 MOVLW   0x02            ; Espera corta (2->W)
+0016   206C           00049                 CALL    DLY1            ; 2 * 0.5 = Retardo de 1 milisegundo
+0017   3038           00050                 MOVLW   b'00111000'     ;FUNCTION SET - 8 BIT, BIT_E = 1
+0018   0086           00051                 MOVWF   PORTB
+0019   1186           00052                 BCF             PORTB,BIT_E     ; BIT_E = 0
+                      00053                 ; El bit Busy ya puede ser consultado
+001A   203B           00054                 CALL    LCDBUSY         ; Consulta al bit Busy
+001B   3028           00055                 MOVLW   b'00101000'     ; FUNCTION SET - 4 BIT , BIT_E = 1
+001C   0086           00056                 MOVWF   PORTB
+001D   1186           00057                 BCF             PORTB,BIT_E
+                      00058                 ; Todos los comandos deben ser cada dos ciclos desde este punto
+001E   203B           00059                 CALL    LCDBUSY         ; FUNCTION SET
+001F   3028           00060                 MOVLW   B'00101000'
+0020   0086           00061                 MOVWF   PORTB
+0021   1186           00062                 BCF             PORTB,BIT_E     ; 1 Ciclo
+0022   3088           00063                 MOVLW   B'10001000'
+0023   0086           00064                 MOVWF   PORTB
+0024   1186           00065                 BCF             PORTB,BIT_E     ; 2 Ciclos
+0025   203B           00066                 CALL    LCDBUSY         ; DISPLAY CONTROL 
+0026   3008           00067                 MOVLW   B'00001000'     ; Primer Nibble y BIT_E = 1, BIT_RW = 0, BIT_RS  =0
+0027   0086           00068                 MOVWF   PORTB
+0028   1186           00069                 BCF             PORTB,BIT_E     ; 1 Ciclo
+0029   30F8           00070                 MOVLW   B'11111000'     ; DISPLAY CONTROL NIBBLE
+                      00071                                                         ; (DISP=ON,CURSOR=ON,BLINK=ON) AND BIT_E=1,BIT_R
+                            W=0,BIT_RS=0
+002A   0086           00072                 MOVWF   PORTB
+002B   1186           00073                 BCF             PORTB,BIT_E     ; 2 Ciclos
+                      00074                 
+002C   203B           00075                 CALL    LCDBUSY         ; Limpiar el LCD y poner el cursor en Home
+002D   3008           00076                 MOVLW   B'00001000'
+002E   0086           00077                 MOVWF   PORTB
+002F   1186           00078                 BCF             PORTB,BIT_E
+0030   3018           00079                 MOVLW   B'00011000'
+0031   0086           00080                 MOVWF   PORTB
+0032   1186           00081                 BCF             PORTB,BIT_E
+                      00082                 
+0033   203B           00083                 CALL    LCDBUSY         ; ENTRY SET 
+0034   3008           00084                 MOVLW   B'00001000'     ; BIT_E=1,BIT_RW=0,BIT_RS=0
+0035   0086           00085                 MOVWF   PORTB
+0036   1186           00086                 BCF             PORTB,BIT_E     ;1 CYCLE
+0037   3068           00087                 MOVLW   B'01101000'     ; ENTRY SET - INCREMENT,NO DISP SHIFT(CUR SHIFT),BIT_E=1,BIT_RW=
+                            0,BIT_RS=0
+0038   0086           00088                 MOVWF   PORTB
+0039   1186           00089                 BCF             PORTB,BIT_E     ;2 CYCLE
+                      00090                 
+003A   0008           00091                 RETURN
+                      00092 
+                      00093 ;*** SUBRUTINA DE CONSULTA SI EL LCD ESTA OCUPADO = LCDBUSY ***                         
+MPASM  5.51                          MAIN.ASM   8-21-2014  7:12:17         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+003B                  00094 LCDBUSY
+003B   1683           00095                 BSF             STATUS,RP0      ; Seleccionar el Banco 1
+003C   30F0           00096                 MOVLW   B'11110000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+003D   0086           00097                 MOVWF   TRISB           ; SET RB7-RB4 INPUT
+003E   1283           00098                 BCF             STATUS,RP0      ; Seleccionar el Banco 0
+                      00099                 
+003F   1506           00100                 BSF             PORTB,BIT_RW
+0040   1086           00101                 BCF             PORTB,BIT_RS
+                      00102                 
+0041   1586           00103                 BSF             PORTB,BIT_E
+0042   0806           00104                 MOVF    PORTB,W         ; Leer
+0043   1186           00105                 BCF             PORTB,BIT_E     ; 1 ciclo
+0044   1506           00106                 BSF             PORTB,BIT_RW
+0045   1086           00107                 BCF             PORTB,BIT_RS
+0046   1586           00108                 BSF             PORTB,BIT_E
+0047   0000           00109                 NOP                                     ; DO NOTTHING COZ BUSY FLAG IS IN FIRST NIBBLE
+0048   1186           00110                 BCF             PORTB,BIT_E     ; 2 ciclo
+                      00111                 
+0049   3980           00112                 ANDLW   0x80
+004A   1D03           00113                 BTFSS   STATUS,Z        ; Verifica bit Busy
+004B   283B           00114                 GOTO    LCDBUSY         ; Esperar que se desocupe el LCD
+                      00115                 
+004C   1106           00116                 BCF             PORTB,BIT_RW    ;
+004D   1683           00117                 BSF             STATUS,RP0              ; NOT BUSY SO MAKE PORT B O/P
+004E   3000           00118                 MOVLW   0x00
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+004F   0086           00119                 MOVWF   TRISB
+0050   1283           00120                 BCF             STATUS,RP0
+                      00121                 
+0051   0008           00122                 RETURN
+                      00123 
+                      00124 ;*** SUBRUTINAS COMANDOS LCD ***                                
+                      00125 ;*** COMANDO LINEA 2 = LINE2 ***                
+0052                  00126 LINE2           ;by selecting DDRAM address = 0x40 in case of 16x4 line LCD, see datasheet of HD44780
+0052   203B           00127                 CALL    LCDBUSY
+0053   30C8           00128                 MOVLW   B'11001000'
+0054   0086           00129                 MOVWF   PORTB
+0055   1186           00130                 BCF             PORTB,BIT_E     ; E=0
+0056   3008           00131                 MOVLW   B'00001000'
+0057   0086           00132                 MOVWF   PORTB
+0058   1186           00133                 BCF             PORTB,BIT_E
+0059   0008           00134                 RETURN
+                      00135                 
+                      00136 ;*** COMANDO ESCRIBIR EN EL LCD = LCDWRITE ***          
+005A                  00137 LCDWRITE                ;Writes data/character in W register to sellected CG/DD RAM, see its use in STAR
+                            T routine
+005A   00A0           00138                 MOVWF   TEMP
+005B   203B           00139                 CALL    LCDBUSY
+005C   0820           00140                 MOVF    TEMP,W
+005D   39F0           00141                 ANDLW   B'11110000'
+005E   380A           00142                 IORLW   B'00001010'     ; BIT_E=1, BIT_RW=0, BIT_RS=1
+005F   0086           00143                 MOVWF   PORTB
+MPASM  5.51                          MAIN.ASM   8-21-2014  7:12:17         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0060   1186           00144                 BCF             PORTB,BIT_E     ; 1 Ciclo
+0061   0E20           00145                 SWAPF   TEMP,W          ; SWAP NIBBLES AND STORE IN W REGISTER
+0062   39F0           00146                 ANDLW   B'11110000'
+0063   380A           00147                 IORLW   B'00001010'     ; BIT_E=1,BIT_RW=0,BIT_RS=1
+0064   0086           00148                 MOVWF   PORTB
+0065   1186           00149                 BCF             PORTB,BIT_E     ; 2 Ciclos
+                      00150                 
+0066   0008           00151                 RETURN
+                      00152 
+                      00153 ;*** SUBRUTINA DE 500 MICROSEGUNDOS CON CRISTAL DE 4 MHZ = DLY ***
+                      00154                                                         ; Llamada a la subrutina                        
+                              2 Ciclos
+0067   30A5           00155 DLY     MOVLW   D'165'          ; Carga el literal 165 en W (165->W). 1 Ciclo
+0068   00A1           00156         MOVWF   V_DLY           ; Carga W en la variable V_DLY.           1 Ciclo
+0069                  00157 DLY_LOOP
+0069   0BA1           00158         DECFSZ  V_DLY, F    ; Decrementa V_DLY hasta que sea 0. 166 = 165 + 1 Ciclos
+006A   2869           00159         GOTO    DLY_LOOP    ; Salto a la etiqueta DLY_LOOP      328 = 2 * 164 Ciclos
+006B   0008           00160         RETURN              ; Retorno de subrutina                                2 Ciclos
+                      00161                                                         ;                                               
+                                                    ----------------------
+                      00162                                                         ; 500 us de retardo                     TOTAL = 
+                            500 Ciclos
+                      00163 
+                      00164 ;*** SUBRUTINA DE DELAY N-VECES 500 MICROSEGUNDOS = DLY1 ***
+006C   00A2           00165 DLY1    MOVWF V_DLY1            
+006D                  00166 DLY1_LOOP
+006D   2067           00167         CALL DLY           
+006E   0BA2           00168         DECFSZ V_DLY1, F         
+006F   286D           00169         GOTO DLY1_LOOP     
+0070   0008           00170                 RETURN                      
+                      00171 
+                      00172 ;*** INICIO DE PROGRAMA ***
+0071   2005           00173 INICIO  CALL INITPIC            ; Inicializa el PIC
+0072   200B           00174                 CALL INITLCD            ; Inicializa el LCD
+                      00175 
+0073   019F           00176                 CLRF Digito                     ;Pone a 0 la variable digito 
+0074   081F           00177 REPETIR MOVF Digito,W           ;W=Digito
+0075   2088           00178                 CALL DATO_1                     ;Coge el caracter 
+0076   3800           00179                 IORLW 0                         ;Compara 
+0077   1903           00180                 BTFSC STATUS,2          ;Es el ultimo? 
+0078   287C           00181                 GOTO SIG                        ;Si 
+0079   205A           00182                 CALL LCDWRITE           ;Visualiza caracter 
+007A   0A9F           00183                 INCF Digito,F           ;Incrementa numero de Digito
+007B   2874           00184                 GOTO REPETIR            ;Vuelve a escribir                                              
+                      00185                         
+007C   2052           00186 SIG             CALL LINE2                      ;set crussor to line 2
+                      00187 
+007D   019F           00188                 CLRF Digito                     ;Pone a 0 la variable digito 
+007E   081F           00189 REP2    MOVF Digito,W           ;W=Digito
+007F   2095           00190                 CALL DATO_2                     ;Coge el caracter 
+0080   3800           00191                 IORLW 0                         ;Compara 
+0081   1903           00192                 BTFSC STATUS,2          ;Es el ultimo? 
+0082   2886           00193                 GOTO LOOP                       ;Si 
+MPASM  5.51                          MAIN.ASM   8-21-2014  7:12:17         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0083   205A           00194                 CALL LCDWRITE           ;Visualiza caracter 
+0084   0A9F           00195                 INCF Digito,F           ;Incrementa numero de Digito
+0085   287E           00196                 GOTO REP2                       ;Vuelve a escribir                                      
+                                                    
+                      00197                 
+0086   0000           00198 LOOP    NOP             
+0087   2886           00199                 GOTO LOOP                       ;endless loop
+                      00200 
+0088   0782           00201 DATO_1  ADDWF  PCL,1 
+0089   3448           00202                 RETLW  'H' 
+008A   344F           00203                 RETLW  'O'
+008B   344C           00204                 RETLW  'L' 
+008C   3441           00205                 RETLW  'A' 
+008D   3420           00206                 RETLW  ' ' 
+008E   344D           00207                 RETLW  'M' 
+008F   3455           00208                 RETLW  'U' 
+0090   344E           00209                 RETLW  'N' 
+0091   3444           00210                 RETLW  'D' 
+0092   344F           00211                 RETLW  'O' 
+0093   3421           00212                 RETLW  '!' 
+0094   3400           00213                 RETLW 0x00 
+                      00214 
+0095   0782           00215 DATO_2  ADDWF  PCL,1 
+0096   344C           00216                 RETLW  'L' 
+0097   3449           00217                 RETLW  'I'
+0098   344E           00218                 RETLW  'N' 
+0099   3445           00219                 RETLW  'E' 
+009A   3441           00220                 RETLW  'A' 
+009B   3420           00221                 RETLW  ' ' 
+009C   3444           00222                 RETLW  'D' 
+009D   344F           00223                 RETLW  'O' 
+009E   3453           00224                 RETLW  'S' 
+009F   3400           00225                 RETLW 0x00 
+                      00226         
+                      00227                 END
+MPASM  5.51                          MAIN.ASM   8-21-2014  7:12:17         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+BIT_E                             00000003
+BIT_RS                            00000001
+BIT_RW                            00000002
+C                                 00000000
+DATO_1                            00000088
+DATO_2                            00000095
+DC                                00000001
+DLY                               00000067
+DLY1                              0000006C
+DLY1_LOOP                         0000006D
+DLY_LOOP                          00000069
+Digito                            0000001F
+EEADR                             00000009
+EECON1                            00000088
+EECON2                            00000089
+EEDATA                            00000008
+EEIE                              00000006
+EEIF                              00000004
+F                                 00000001
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INICIO                            00000071
+INITLCD                           0000000B
+INITPIC                           00000005
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+LCDBUSY                           0000003B
+LCDWRITE                          0000005A
+LINE2                             00000052
+LOOP                              00000086
+NOT_PD                            00000003
+NOT_RBPU                          00000007
+NOT_TO                            00000004
+OPTION_REG                        00000081
+PCL                               00000002
+PCLATH                            0000000A
+PORTA                             00000005
+PORTB                             00000006
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RB0                               00000000
+RB1                               00000001
+MPASM  5.51                          MAIN.ASM   8-21-2014  7:12:17         PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RD                                00000000
+REP2                              0000007E
+REPETIR                           00000074
+RP0                               00000005
+RP1                               00000006
+SIG                               0000007C
+STATUS                            00000003
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+TEMP                              00000020
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+V_DLY                             00000021
+V_DLY1                            00000022
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_CONFIG                           00002007
+_CP_OFF                           00003FFF
+_CP_ON                            0000000F
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+MPASM  5.51                          MAIN.ASM   8-21-2014  7:12:17         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F84A                          00000001
+__DEBUG                           1
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : X---XXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0080 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:   157
+Program Memory Words Free:   867
+
+
+Errors   :     0
+Warnings :     1 reported,     0 suppressed
+Messages :     3 reported,     0 suppressed
+
+

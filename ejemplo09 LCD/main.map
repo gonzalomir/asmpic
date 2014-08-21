@@ -1,0 +1,64 @@
+MPLINK 4.49, Linker
+Linker Map File - Created Thu Aug 21 07:12:18 2014
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_1       code   0x000000    program   0x000002
+                   .org_2       code   0x000004    program   0x000138
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000004    0x00009f      
+            157 out of 1094 program addresses used, program memory utilization is 14%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   DATO_1   0x000088    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                   DATO_2   0x000095    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                      DLY   0x000067    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                     DLY1   0x00006c    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                DLY1_LOOP   0x00006d    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                 DLY_LOOP   0x000069    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                   INICIO   0x000071    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                  INITLCD   0x00000b    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                  INITPIC   0x000005    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                  LCDBUSY   0x00003b    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                 LCDWRITE   0x00005a    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                    LINE2   0x000052    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                     LOOP   0x000086    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                     REP2   0x00007e    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                  REPETIR   0x000074    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                      SIG   0x00007c    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  INITPIC   0x000005    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                  INITLCD   0x00000b    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                  LCDBUSY   0x00003b    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                    LINE2   0x000052    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                 LCDWRITE   0x00005a    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                      DLY   0x000067    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                 DLY_LOOP   0x000069    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                     DLY1   0x00006c    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                DLY1_LOOP   0x00006d    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                   INICIO   0x000071    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                  REPETIR   0x000074    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                      SIG   0x00007c    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                     REP2   0x00007e    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                     LOOP   0x000086    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                   DATO_1   0x000088    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+                   DATO_2   0x000095    program     static G:\icei\asmpic\ejemplo09 LCD\main.asm
+
+
